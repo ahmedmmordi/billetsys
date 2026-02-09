@@ -37,7 +37,7 @@ The users defined for testing are
 
 ## Contributing
 
-Contributions to `pgopr` are managed on [GitHub.com](https://github.com/mnemosyne-systems/billetsys/)
+Contributions to `billetsys` are managed on [GitHub.com](https://github.com/mnemosyne-systems/billetsys/)
 
 * [Ask a question](https://github.com/mnemosyne-systems/billetsys/discussions)
 * [Raise an issue](https://github.com/mnemosyne-systems/billetsys/issues)
