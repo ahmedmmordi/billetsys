@@ -36,6 +36,25 @@
         text-decoration: none;
         font-weight: 600;
     }
+    .markdown-output p {
+        margin: 0 0 6px 0;
+    }
+    .markdown-output p:last-child {
+        margin-bottom: 0;
+    }
+    .markdown-output ul {
+        margin: 0 0 6px 18px;
+        padding: 0;
+    }
+    .markdown-output h1,
+    .markdown-output h2,
+    .markdown-output h3,
+    .markdown-output h4,
+    .markdown-output h5,
+    .markdown-output h6 {
+        margin: 0 0 6px 0;
+        font-size: 14px;
+    }
 </style>
 <table>
     <thead>
@@ -52,7 +71,9 @@
     {#for message in messages}
     <tr>
         <td>{message.id}</td>
-        <td>{message.body}</td>
+        <td>
+            <div class="markdown-output">{message.body.markdown}</div>
+        </td>
         <td>{message.date}</td>
         <td>{message.ticket.name}</td>
         <td>{#if message.author != null}<a href="mailto:{message.author.email}">{message.author.email}</a>{#else}-{/if}</td>

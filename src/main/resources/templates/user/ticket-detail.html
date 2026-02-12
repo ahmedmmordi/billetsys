@@ -29,7 +29,7 @@
 {#for message in messages}
 <div style="margin-bottom: 12px;">
     <div><strong>{messageLabels.get(message.id)}</strong></div>
-    <div>{message.body}</div>
+    <div class="markdown-output">{message.body.markdown}</div>
     {#if !message.attachments.isEmpty}
     <div style="background: rgba(176, 0, 32, 0.06); padding: 6px 10px; margin-top: 6px; display: flex; gap: 12px;">
         {#for attachment in message.attachments}

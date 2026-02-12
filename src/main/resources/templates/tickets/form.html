@@ -89,7 +89,7 @@
 {#for message in messages}
 <div style="margin-bottom: 12px;">
     <div><strong>{messageLabels.get(message.id)}</strong></div>
-    <div>{message.body}</div>
+    <div class="markdown-output">{message.body.markdown}</div>
 </div>
 {/for}
 {/if}

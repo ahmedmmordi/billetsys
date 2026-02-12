@@ -29,7 +29,7 @@
             {#for message in ticketMessages.get(ticket.id)}
             <div style="margin-top: 6px;">
                 <div><strong>{messageLabels.get(message.id)}</strong></div>
-                <div>{message.body}</div>
+                <div class="markdown-output">{message.body.markdown}</div>
             </div>
             {/for}
         </td>
