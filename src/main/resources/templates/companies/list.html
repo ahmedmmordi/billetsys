@@ -22,7 +22,6 @@
         <th>State <button class="sort-button" type="button" onclick="sortTable(this, 6)">↕</button></th>
         <th>Zip <button class="sort-button" type="button" onclick="sortTable(this, 7)">↕</button></th>
         <th>Country <button class="sort-button" type="button" onclick="sortTable(this, 8)">↕</button></th>
-        <th>Actions <button class="sort-button" type="button" onclick="sortTable(this, 9)">↕</button></th>
     </tr>
     </thead>
     <tbody>
@@ -37,12 +36,6 @@
         <td>{company.state}</td>
         <td>{company.zip}</td>
         <td>{#if company.country}{company.country.name}{/if}</td>
-        <td data-sort-value="{company.id}">
-            <a href="/companies/{company.id}/edit">Edit</a>
-            <form class="inline" method="post" action="/companies/{company.id}/delete">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
     </tr>
     {/for}
     </tbody>

@@ -64,7 +64,6 @@
         <th>Date <button class="sort-button" type="button" onclick="sortTable(this, 2)">↕</button></th>
         <th>Ticket <button class="sort-button" type="button" onclick="sortTable(this, 3)">↕</button></th>
         <th>Author <button class="sort-button" type="button" onclick="sortTable(this, 4)">↕</button></th>
-        <th>Actions <button class="sort-button" type="button" onclick="sortTable(this, 5)">↕</button></th>
     </tr>
     </thead>
     <tbody>
@@ -77,16 +76,10 @@
         <td>{message.date}</td>
         <td>{message.ticket.name}</td>
         <td>{#if message.author != null}<a href="mailto:{message.author.email}">{message.author.email}</a>{#else}-{/if}</td>
-        <td data-sort-value="{message.id}">
-            <a href="/messages/{message.id}/edit">Edit</a>
-            <form class="inline" method="post" action="/messages/{message.id}/delete">
-                <button type="submit">Delete</button>
-            </form>
-        </td>
     </tr>
     {#if !message.attachments.isEmpty}
     <tr class="message-attachments">
-        <td colspan="6">
+        <td colspan="5">
             {#for attachment in message.attachments}
             <div class="attachment-footer">
                 <span class="attachment-name">
