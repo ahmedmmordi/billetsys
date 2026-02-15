@@ -280,13 +280,16 @@
             background: #f6f6f6;
             border-bottom: 1px solid var(--card-border);
         }
-        .markdown-toolbar button {
+        .markdown-toolbar button,
+        .markdown-toolbar select {
             border: 1px solid var(--card-border);
             background: #ffffff;
             border-radius: 4px;
-            padding: 4px 8px;
+            padding: 2px 6px;
             cursor: pointer;
             font-weight: 600;
+            font-size: 12px;
+            line-height: 1.2;
         }
         .markdown-panels {
             display: grid;
@@ -399,6 +402,8 @@
             font-weight: 700;
         }
     </style>
+    <link rel="stylesheet" href="/webjars/highlightjs/11.11.1/styles/github.min.css">
+    <script src="/webjars/highlightjs/11.11.1/highlight.min.js"></script>
 </head>
 <body>
 <header class="app-header">
@@ -705,18 +710,24 @@
         let inList = false;
         let inCodeBlock = false;
         let codeBuffer = [];
+        let codeLanguage = '';
         lines.forEach(line => {
             if (line.trim().startsWith('```')) {
                 if (inCodeBlock) {
-                    html += '<pre><code>' + escapeMarkdownHtml(codeBuffer.join('\n')) + '</code></pre>';
+                    const className = codeLanguage ? ' class="language-' + codeLanguage + '"' : '';
+                    html += '<pre><code' + className + '>' + escapeMarkdownHtml(codeBuffer.join('\n'))
+                        + '</code></pre>';
                     inCodeBlock = false;
                     codeBuffer = [];
+                    codeLanguage = '';
                 } else {
                     if (inList) {
                         html += '</ul>';
                         inList = false;
                     }
                     inCodeBlock = true;
+                    const language = line.trim().substring(3).trim().toLowerCase();
+                    codeLanguage = /^[a-z0-9_+-]+$/.test(language) ? language : '';
                 }
                 return;
             }
@@ -756,7 +767,8 @@
             html += '<p>' + renderMarkdownInline(line) + '</p>';
         });
         if (inCodeBlock) {
-            html += '<pre><code>' + escapeMarkdownHtml(codeBuffer.join('\n')) + '</code></pre>';
+            const className = codeLanguage ? ' class="language-' + codeLanguage + '"' : '';
+            html += '<pre><code' + className + '>' + escapeMarkdownHtml(codeBuffer.join('\n')) + '</code></pre>';
         }
         if (inList) {
             html += '</ul>';
@@ -764,7 +776,7 @@
         return html;
     }
 
-    function applyMarkdownAction(input, action) {
+    function applyMarkdownAction(input, action, option) {
         const start = input.selectionStart || 0;
         const end = input.selectionEnd || 0;
         const selected = input.value.substring(start, end);
@@ -807,8 +819,10 @@
                 break;
             case 'code-block': {
                 const value = selected || 'code';
-                const replacement = '```\n' + value + '\n```';
-                replaceRange(replacement, start + 4, start + 4 + value.length);
+                const language = option || '';
+                const fence = language ? '```' + language : '```';
+                const replacement = fence + '\n' + value + '\n```';
+                replaceRange(replacement, start + fence.length + 1, start + fence.length + 1 + value.length);
                 break;
             }
             case 'link': {
@@ -833,10 +847,28 @@
             }
             const render = () => {
                 preview.innerHTML = renderMarkdown(input.value);
+                highlightCodeBlocks(preview);
             };
             input.addEventListener('input', render);
             render();
             if (toolbar) {
+                const codeBlockButton = toolbar.querySelector('[data-md-action="code-block"]');
+                if (codeBlockButton) {
+                    const select = document.createElement('select');
+                    select.setAttribute('aria-label', 'Code language');
+                    select.setAttribute('data-md-code-language', 'true');
+                    select.innerHTML = '<option value="__label">Code</option>'
+                        + '<option value="">Plaintext</option>'
+                        + '<option value="sql">SQL</option>'
+                        + '<option value="c">C</option>'
+                        + '<option value="cpp">C++</option>'
+                        + '<option value="go">Go</option>'
+                        + '<option value="java">Java</option>'
+                        + '<option value="javascript">JavaScript</option>'
+                        + '<option value="python">Python</option>'
+                        + '<option value="rust">Rust</option>';
+                    codeBlockButton.replaceWith(select);
+                }
                 toolbar.addEventListener('click', event => {
                     const button = event.target.closest('[data-md-action]');
                     if (!button) {
@@ -844,6 +876,18 @@
                     }
                     event.preventDefault();
                     applyMarkdownAction(input, button.getAttribute('data-md-action'));
+                    render();
+                });
+                toolbar.addEventListener('change', event => {
+                    const select = event.target.closest('[data-md-code-language]');
+                    if (!select) {
+                        return;
+                    }
+                    if (select.value === '__label') {
+                        return;
+                    }
+                    applyMarkdownAction(input, 'code-block', select.value);
+                    select.value = '__label';
                     render();
                 });
             }
@@ -855,7 +899,16 @@
         outputs.forEach(output => {
             const source = (output.textContent || '').trim();
             output.innerHTML = renderMarkdown(source);
+            highlightCodeBlocks(output);
         });
+    }
+
+    function highlightCodeBlocks(root) {
+        if (typeof hljs === 'undefined') {
+            return;
+        }
+        const blocks = (root || document).querySelectorAll('pre code');
+        blocks.forEach(block => hljs.highlightElement(block));
     }
 
     updateHeaderClock();
@@ -864,6 +917,7 @@
     setupAttachmentInputs();
     setupMarkdownEditors();
     setupMarkdownOutputs();
+    highlightCodeBlocks(document);
     </script>
 </body>
 </html>
